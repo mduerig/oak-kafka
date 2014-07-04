@@ -26,12 +26,12 @@ class KafkaObserverService extends Observer {
 
   val METADATA_BROKER_LIST_DEFAULT = "localhost:9092"
 
-  @Property(description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("localhost:9092"))
+  @Property(name = "metadata.broker.list", description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("localhost:9092"))
   val METADATA_BROKER_LIST = "metadata.broker.list"
 
   val SERIALIZER_CLASS_DEFAULT = "kafka.serializer.StringEncoder"
 
-  @Property(description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("kafka.serializer.StringEncoder"))
+  @Property(name = "serializer.class", description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("kafka.serializer.StringEncoder"))
   val SERIALIZER_CLASS = "serializer.class"
 
   var delegate: Option[Observer] = None;
