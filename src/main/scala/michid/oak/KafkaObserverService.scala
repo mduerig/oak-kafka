@@ -17,31 +17,39 @@ import kafka.producer.Producer
 import kafka.producer.ProducerConfig
 
 /**
- * This {@code Observer} instance wraps a {@link KafkaObserver} into
+ * This `Observer` instance wraps a [[michid.oak.KafkaObserver]] into
  * an OSGi service.
  */
-@Component(specVersion = "1.1", immediate = true)
+@Component(specVersion = "1.1", immediate = true, metatype = true)
 @Service(value = Array(classOf[Observer]))
 class KafkaObserverService extends Observer {
 
   val METADATA_BROKER_LIST_DEFAULT = "localhost:9092"
 
-  @Property(name = "metadata.broker.list", description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("localhost:9092"))
+  @Property(
+    name = "metadata.broker.list",
+    description = "See http://kafka.apache.org/documentation.html#producerconfigs",
+    value = Array("localhost:9092"))
   val METADATA_BROKER_LIST = "metadata.broker.list"
 
   val SERIALIZER_CLASS_DEFAULT = "kafka.serializer.StringEncoder"
 
-  @Property(name = "serializer.class", description = "See http://kafka.apache.org/documentation.html#producerconfigs", value = Array("kafka.serializer.StringEncoder"))
+  @Property(
+    name = "serializer.class",
+    description = "See http://kafka.apache.org/documentation.html#producerconfigs",
+    value = Array("kafka.serializer.StringEncoder"))
   val SERIALIZER_CLASS = "serializer.class"
 
-  var delegate: Option[Observer] = None;
+  var delegate: Option[Observer] = None
 
   @Activate
   protected def activate(context: ComponentContext) {
     val properties = context.getProperties
     val producerProps = new Properties
-    producerProps.put(METADATA_BROKER_LIST, getString(properties, METADATA_BROKER_LIST, METADATA_BROKER_LIST_DEFAULT))
-    producerProps.put(SERIALIZER_CLASS, getString(properties, SERIALIZER_CLASS, SERIALIZER_CLASS_DEFAULT))
+    producerProps.put(METADATA_BROKER_LIST,
+      getString(properties, METADATA_BROKER_LIST, METADATA_BROKER_LIST_DEFAULT))
+    producerProps.put(SERIALIZER_CLASS,
+      getString(properties, SERIALIZER_CLASS, SERIALIZER_CLASS_DEFAULT))
     val producer = new Producer[String, String](new ProducerConfig(producerProps))
     delegate = Some(new KafkaObserver("/", producer))
   }
@@ -52,7 +60,7 @@ class KafkaObserverService extends Observer {
   }
 
   @Deactivate
-  def deactivate() = {
+  def deactivate() {
     delegate = None
   }
 

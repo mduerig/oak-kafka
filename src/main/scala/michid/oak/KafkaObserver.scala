@@ -25,14 +25,13 @@ import kafka.producer.KeyedMessage
 import kafka.producer.Producer
 
 /**
- * This {@code Observer} implementation sends all changes to an
+ * This `Observer` implementation sends all changes to an
  * Jackrabbit Oak repository to a Kafka server.
  *
- * @see <a href="http://kafka.apache.org/documentation.html#producerconfigs">Kafka Producer Configs</a>
+ * @see http://kafka.apache.org/documentation.html#producerconfigs
  */
 class KafkaObserver(val path: String, val producer: Producer[String, String]) extends Observer {
-
-  val LOG: Logger = LoggerFactory.getLogger(classOf[KafkaObserver]);
+  val LOG: Logger = LoggerFactory.getLogger(classOf[KafkaObserver])
 
   private val messages = ArrayBuffer.empty[KeyedMessage[String, String]]
 
@@ -44,7 +43,8 @@ class KafkaObserver(val path: String, val producer: Producer[String, String]) ex
 
       var before = previousRoot
       var after = root
-      var handler: EventHandler = new FilteredHandler(new VisibleFilter(), new NodeEventHandler("/", namePathMapper))
+      var handler: EventHandler = new FilteredHandler(
+        new VisibleFilter(), new NodeEventHandler("/", namePathMapper))
 
       val oakPath = namePathMapper.getOakPath(path)
       if (oakPath == null) {
@@ -72,52 +72,43 @@ class KafkaObserver(val path: String, val producer: Producer[String, String]) ex
   }
 
   private def sendPendingMessages() {
-    if (!messages.isEmpty) {
-      messages.foreach(producer.send(_))
-      messages.clear()
-    }
+    messages.foreach(producer.send(_))
+    messages.clear()
   }
 
   private def toString(info: CommitInfo): String = {
-    if (info == null) CommitInfo.EMPTY.toString else info.toString
+    if (info == null) CommitInfo.EMPTY.toString
+    else info.toString
   }
 
   sealed trait EventType
-
   case object NODE_ADDED extends EventType
-
   case object NODE_DELETED extends EventType
-
   case object NODE_CHANGED extends EventType
-
   case object PROPERTY_ADDED extends EventType
-
   case object PROPERTY_DELETED extends EventType
-
   case object PROPERTY_CHANGED extends EventType
 
-  def itemChanged(eventType: EventType, jcrPath: String) {
+  private def itemChanged(eventType: EventType, jcrPath: String) {
     messages += new KeyedMessage[String, String](eventType.toString, eventType.toString, jcrPath)
   }
 
-  private class NodeEventHandler private (val path: String, val namePathMapper: NamePathMapper, val eventType: EventType) extends DefaultEventHandler {
+  private class NodeEventHandler private (val path: String, val namePathMapper: NamePathMapper,
+                                          val eventType: EventType) extends DefaultEventHandler {
 
     def this(path: String, namePathMapper: NamePathMapper) {
       this(path, namePathMapper, NODE_CHANGED)
     }
 
     private def this(parent: NodeEventHandler, name: String, eventType: EventType) {
-      this(if ("/" == parent.path) '/' + name else parent.path + '/' + name, parent.namePathMapper, eventType)
+      this(if ("/" == parent.path) '/' + name else parent.path + '/' + name, parent.namePathMapper,
+        eventType)
     }
 
     override def getChildHandler(name: String, before: NodeState, after: NodeState): EventHandler = {
-      if (!before.exists()) {
-        new NodeEventHandler(this, name, NODE_ADDED)
-      } else if (!after.exists()) {
-        new NodeEventHandler(this, name, NODE_DELETED)
-      } else {
-        new NodeEventHandler(this, name, NODE_CHANGED)
-      }
+      if (!before.exists()) new NodeEventHandler(this, name, NODE_ADDED)
+      else if (!after.exists()) new NodeEventHandler(this, name, NODE_DELETED)
+      else new NodeEventHandler(this, name, NODE_CHANGED)
     }
 
     override def enter(before: NodeState, after: NodeState) = eventType match {

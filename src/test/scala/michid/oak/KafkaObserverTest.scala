@@ -30,7 +30,7 @@ object KafkaObserverTest {
   def main(args: Array[String]) {
     val producer = createProducer()
     val repository = createRepository(producer)
-    val session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()))
+    val session = repository.login(new SimpleCredentials("admin", "admin".toCharArray))
     session.getRootNode.addNode("new node " + System.currentTimeMillis())
     session.save()
     session.logout()
@@ -49,8 +49,8 @@ object KafkaObserverTest {
   }
 
   private def shutdown(repository: Repository) {
-    if (repository.isInstanceOf[JackrabbitRepository]) {
-      repository.asInstanceOf[JackrabbitRepository].shutdown()
+    repository match {
+      case jrRep: JackrabbitRepository => jrRep.shutdown()
     }
   }
 }
