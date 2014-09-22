@@ -1,5 +1,7 @@
 package michid.oak
 
+import org.apache.jackrabbit.oak.plugins.observation.filter.VisibleFilter.VISIBLE_FILTER
+
 import scala.collection.JavaConversions.iterableAsScalaIterable
 
 import scala.collection.mutable.ArrayBuffer
@@ -44,7 +46,7 @@ class KafkaObserver(val path: String, val producer: Producer[String, String]) ex
       var before = previousRoot
       var after = root
       var handler: EventHandler = new FilteredHandler(
-        new VisibleFilter(), new NodeEventHandler("/", namePathMapper))
+        VISIBLE_FILTER, new NodeEventHandler("/", namePathMapper))
 
       val oakPath = namePathMapper.getOakPath(path)
       if (oakPath == null) {
