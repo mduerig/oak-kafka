@@ -20,6 +20,7 @@
 package michid.oak;
 
 import static org.apache.jackrabbit.oak.commons.PathUtils.concat;
+import static org.apache.jackrabbit.oak.plugins.observation.filter.VisibleFilter.VISIBLE_FILTER;
 
 import java.util.List;
 
@@ -35,7 +36,6 @@ import org.apache.jackrabbit.oak.plugins.observation.DefaultEventHandler;
 import org.apache.jackrabbit.oak.plugins.observation.EventGenerator;
 import org.apache.jackrabbit.oak.plugins.observation.EventHandler;
 import org.apache.jackrabbit.oak.plugins.observation.FilteredHandler;
-import org.apache.jackrabbit.oak.plugins.observation.filter.VisibleFilter;
 import org.apache.jackrabbit.oak.spi.commit.CommitInfo;
 import org.apache.jackrabbit.oak.spi.commit.Observer;
 import org.apache.jackrabbit.oak.spi.state.NodeState;
@@ -72,7 +72,7 @@ public class KafkaObserver implements Observer {
             NodeState before = previousRoot;
             NodeState after = root;
             EventHandler handler = new FilteredHandler(
-                    new VisibleFilter(),
+                    VISIBLE_FILTER,
                     new NodeEventHandler("/", namePathMapper));
 
             String oakPath = namePathMapper.getOakPath(path);
