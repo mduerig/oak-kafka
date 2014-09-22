@@ -16,7 +16,6 @@ import org.apache.jackrabbit.oak.plugins.observation.DefaultEventHandler
 import org.apache.jackrabbit.oak.plugins.observation.EventGenerator
 import org.apache.jackrabbit.oak.plugins.observation.EventHandler
 import org.apache.jackrabbit.oak.plugins.observation.FilteredHandler
-import org.apache.jackrabbit.oak.plugins.observation.filter.VisibleFilter
 import org.apache.jackrabbit.oak.spi.commit.CommitInfo
 import org.apache.jackrabbit.oak.spi.commit.Observer
 import org.apache.jackrabbit.oak.spi.state.NodeState
